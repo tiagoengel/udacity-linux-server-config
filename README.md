@@ -45,7 +45,7 @@ A detailed list of the actual commands I've used to configure to server can be s
 
 - catalog project cloned to `/home/catalog/udacity-item-catalog`
 - catalog user added to postgres with password
-- changed catalog's connection url to provide username and password
+- changed catalog's db connection url to provide username and password
 - catalog database created and configured
 - wsgi script for the catalog app created at `/var/www/wsgi-scripts/catalog.wsgi`
 - apache2 default config changed to load the catalog app at `/`
