@@ -1,0 +1,66 @@
+apt-get -qqy update
+apt-get upgrade -y
+useradd grader
+passwd grader (12qwaszx)
+
+nano /etc/sudoers
+# added grader ALL=(ALL:ALL) ALL
+
+ssh-keygen (for grader)
+
+# local machine
+ssh-copy-id -i ~/.ssh/udacity-grader.pub grader@54.91.73.130
+
+nano /etc/ssh/sshd_config (disabled root login and password login)
+
+useradd catalog
+passwd catalog (master)
+
+nano /etc/ssh/sshd_config (changed port to 2200)
+
+sudo su
+mkhomedir_helper catalog
+
+su catalog
+git clone https://github.com/tiagoengel/udacity-item-catalog
+cd udacity-item-catalog
+
+
+apt-get -qqy install make zip unzip postgresql
+apt-get -qqy install python3 python3-pip
+pip3 install --upgrade pip
+pip3 install flask packaging oauth2client passlib flask-httpauth flask-wtf
+pip3 install sqlalchemy flask-sqlalchemy psycopg2 bleach
+su postgres -c 'createuser -dRS catalog'
+su postgres -c "psql -c \"ALTER USER catalog WITH PASSWORD 'catalog'\""
+su catalog -c 'createdb catalog'
+su catalog -c 'createdb catalog_test'
+su catalog -c 'psql -d catalog -f catalog.sql'
+su catalog -c 'psql -d catalog_test -f catalog.sql'
+su catalog -c 'python3 seed.py'
+
+apt-get install libapache2-mod-wsgi-py3 apache2
+
+mkdir /var/www/wsgi-scripts
+touch /var/www/wsgi-scripts/catalog.wsgi
+nano /var/www/wsgi-scripts/catalog.wsgi
+
+nano /etc/apache2/sites-enabled/000-default.conf
+ps -aux | grep apache2 (find apache group)
+
+chown -R www-data:www-data udacity-item-catalog/
+
+cd /var/www/html
+ln -s /home/catalog/udacity-item-catalog/catalog/static/
+
+sudo apt-get install ntpstat
+sudo apt-get install ntpq
+
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow http
+ufw allow 2200/tcp
+ufw allow ntp
+ufw enable
+
+cat /etc/timezone (was configured to UTC already)
